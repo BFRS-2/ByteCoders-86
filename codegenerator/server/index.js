@@ -113,11 +113,15 @@ app.post('/api/generate', upload.single('file'), async (req, res) => {
     // Generate code
     const generatedCode = await generateCode(parsedData, language, fileName);
     
+    // Extract AI insights from generated code
+    const aiInsights = generatedCode['ai-insights.json'] ? JSON.parse(generatedCode['ai-insights.json']) : null;
+    
     res.json({
       success: true,
       data: {
         parsedEndpoints: parsedData.endpoints,
         generatedCode,
+        aiInsights,
         summary: {
           totalEndpoints: parsedData.endpoints.length,
           baseUrl: parsedData.baseUrl,

@@ -4,7 +4,37 @@ import { Brain, Lightbulb, Shield, Zap, TrendingUp, AlertTriangle, CheckCircle, 
 const AIInsights = ({ aiInsights, language }) => {
   const [activeTab, setActiveTab] = useState('overview');
 
-  if (!aiInsights || aiInsights.error) {
+  // Debug logging
+  console.log('AIInsights component received:', { aiInsights, language });
+
+  if (!aiInsights) {
+    return (
+      <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+        <div className="flex items-center space-x-3 mb-4">
+          <Brain className="w-6 h-6 text-blue-600" />
+          <h2 className="text-xl font-semibold text-slate-900">AI Insights</h2>
+        </div>
+        <div className="text-center text-slate-500 py-8">
+          <Brain className="w-12 h-12 mx-auto mb-4 text-slate-300" />
+          <p>AI insights unavailable</p>
+          <p className="text-sm mt-2">No AI analysis data available</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Handle case where aiInsights is a string (JSON)
+  let insightsData = aiInsights;
+  if (typeof aiInsights === 'string') {
+    try {
+      insightsData = JSON.parse(aiInsights);
+    } catch (e) {
+      console.error('Failed to parse AI insights JSON:', e);
+      insightsData = null;
+    }
+  }
+
+  if (!insightsData || insightsData.error) {
     return (
       <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
         <div className="flex items-center space-x-3 mb-4">
@@ -89,7 +119,7 @@ const AIInsights = ({ aiInsights, language }) => {
                   <CheckCircle className="w-8 h-8 text-blue-600" />
                   <div>
                     <p className="text-sm font-medium text-blue-900">Files Analyzed</p>
-                    <p className="text-2xl font-bold text-blue-700">{aiInsights.suggestions?.length || 0}</p>
+                    <p className="text-2xl font-bold text-blue-700">{insightsData.suggestions?.length || 0}</p>
                   </div>
                 </div>
               </div>
@@ -109,7 +139,7 @@ const AIInsights = ({ aiInsights, language }) => {
                   <Lightbulb className="w-8 h-8 text-purple-600" />
                   <div>
                     <p className="text-sm font-medium text-purple-900">Suggestions</p>
-                    <p className="text-2xl font-bold text-purple-700">{aiInsights.optimizations?.length || 0}</p>
+                    <p className="text-2xl font-bold text-purple-700">{insightsData.optimizations?.length || 0}</p>
                   </div>
                 </div>
               </div>
@@ -137,7 +167,7 @@ const AIInsights = ({ aiInsights, language }) => {
 
         {activeTab === 'suggestions' && (
           <div className="space-y-4">
-            {aiInsights.suggestions?.map((suggestion, index) => (
+            {insightsData.suggestions?.map((suggestion, index) => (
               <div key={index} className="border border-slate-200 rounded-lg p-4">
                 <div className="flex items-center justify-between mb-3">
                   <h4 className="font-medium text-slate-900">{suggestion.file}</h4>
@@ -155,7 +185,7 @@ const AIInsights = ({ aiInsights, language }) => {
 
         {activeTab === 'optimizations' && (
           <div className="space-y-4">
-            {aiInsights.optimizations?.map((optimization, index) => (
+            {insightsData.optimizations?.map((optimization, index) => (
               <div key={index} className="border border-slate-200 rounded-lg p-4">
                 <div className="flex items-center justify-between mb-3">
                   <h4 className="font-medium text-slate-900">{optimization.file}</h4>
@@ -173,8 +203,8 @@ const AIInsights = ({ aiInsights, language }) => {
 
         {activeTab === 'security' && (
           <div className="space-y-4">
-            {aiInsights.security?.length > 0 ? (
-              aiInsights.security.map((security, index) => (
+            {insightsData.security?.length > 0 ? (
+              insightsData.security.map((security, index) => (
                 <div key={index} className="border border-red-200 bg-red-50 rounded-lg p-4">
                   <div className="flex items-center space-x-2 mb-3">
                     <AlertTriangle className="w-5 h-5 text-red-600" />
