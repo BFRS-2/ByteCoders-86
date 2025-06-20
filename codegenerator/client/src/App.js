@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { Upload, Code, Download, FileText, Globe, Zap, CheckCircle, AlertCircle } from 'lucide-react';
+import { Upload, Code, Download, FileText, Globe, Zap, CheckCircle, AlertCircle, Brain } from 'lucide-react';
 import FileUpload from './components/FileUpload';
 import LanguageSelector from './components/LanguageSelector';
 import CodePreview from './components/CodePreview';
 import EndpointList from './components/EndpointList';
+import AIInsights from './components/AIInsights';
 import './App.css';
 
 function App() {
@@ -14,6 +15,7 @@ function App() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedCode, setGeneratedCode] = useState(null);
   const [parsedEndpoints, setParsedEndpoints] = useState([]);
+  const [aiInsights, setAiInsights] = useState(null);
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState('upload');
 
@@ -63,6 +65,7 @@ function App() {
 
       setGeneratedCode(result.data.generatedCode);
       setParsedEndpoints(result.data.parsedEndpoints);
+      setAiInsights(result.data.aiInsights);
       setActiveTab('preview');
     } catch (err) {
       setError(err.message);
@@ -116,7 +119,7 @@ function App() {
               </div>
               <div>
                 <h1 className="text-2xl font-bold text-slate-900">API Code Generator</h1>
-                <p className="text-sm text-slate-600">Generate production-ready integration code</p>
+                <p className="text-sm text-slate-600">Generate production-ready integration code with AI-powered insights</p>
               </div>
             </div>
             <div className="flex items-center space-x-4">
@@ -172,6 +175,17 @@ function App() {
                 >
                   <Globe className="w-4 h-4 inline mr-2" />
                   API Endpoints
+                </button>
+                <button
+                  onClick={() => setActiveTab('ai-insights')}
+                  className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                    activeTab === 'ai-insights'
+                      ? 'border-primary-500 text-primary-600'
+                      : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
+                  }`}
+                >
+                  <Brain className="w-4 h-4 inline mr-2" />
+                  AI Insights
                 </button>
               </>
             )}
@@ -307,6 +321,18 @@ function App() {
                     <CheckCircle className="w-5 h-5 text-green-500" />
                     <span className="text-slate-700">Clean, modular architecture</span>
                   </div>
+                  <div className="flex items-center space-x-3">
+                    <Brain className="w-5 h-5 text-blue-500" />
+                    <span className="text-slate-700">AI-powered code suggestions</span>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <Brain className="w-5 h-5 text-blue-500" />
+                    <span className="text-slate-700">Intelligent error detection</span>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <Brain className="w-5 h-5 text-blue-500" />
+                    <span className="text-slate-700">Performance optimization</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -319,6 +345,10 @@ function App() {
 
         {activeTab === 'endpoints' && parsedEndpoints.length > 0 && (
           <EndpointList endpoints={parsedEndpoints} />
+        )}
+
+        {activeTab === 'ai-insights' && aiInsights && (
+          <AIInsights aiInsights={aiInsights} language={selectedLanguage} />
         )}
       </main>
 

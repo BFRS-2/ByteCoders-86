@@ -2,53 +2,62 @@ const { generateNodeCode } = require('./nodeGenerator');
 const { generateJavaCode } = require('./javaGenerator');
 const { generatePhpCode } = require('./phpGenerator');
 const { generateGoCode } = require('./goGenerator');
+const aiEnhancedGenerator = require('./aiEnhancedGenerator');
 
 /**
- * Generate integration code for the specified language
- * @param {Object} parsedData - Parsed API data
- * @param {string} language - Target programming language
- * @param {string} fileName - Original file name
- * @returns {Object} Generated code files
+ * Main Code Generator
+ * Orchestrates code generation for different languages with AI enhancement
  */
 async function generateCode(parsedData, language, fileName) {
   try {
-    const { baseUrl, authMethod, endpoints, title, version, description } = parsedData;
+    console.log(`🚀 Generating ${language} code for ${fileName}`);
     
-    // Generate code based on language
     let generatedCode = {};
     
-    switch (language.toLowerCase()) {
+    // Generate base code based on language
+    switch (language) {
       case 'node.js':
-      case 'nodejs':
-      case 'javascript':
         generatedCode = await generateNodeCode(parsedData, fileName);
         break;
-        
       case 'java':
         generatedCode = await generateJavaCode(parsedData, fileName);
         break;
-        
       case 'php':
         generatedCode = await generatePhpCode(parsedData, fileName);
         break;
-        
       case 'go':
         generatedCode = await generateGoCode(parsedData, fileName);
         break;
-        
       default:
         throw new Error(`Unsupported language: ${language}`);
     }
     
-    // Add documentation
-    generatedCode['docs/README.md'] = generateReadme(parsedData, language);
-    generatedCode['docs/API_SUMMARY.md'] = generateApiSummary(parsedData);
-    generatedCode['docs/USAGE_GUIDE.md'] = generateUsageGuide(parsedData, language);
+    // 🤖 AI Enhancement
+    console.log('🤖 Applying AI enhancements...');
+    const aiEnhanced = await aiEnhancedGenerator.enhanceGeneratedCode(
+      generatedCode, 
+      language, 
+      {
+        title: parsedData.title,
+        version: parsedData.version,
+        description: parsedData.description,
+        baseUrl: parsedData.baseUrl,
+        authMethod: parsedData.authMethod,
+        totalEndpoints: parsedData.endpoints.length
+      }
+    );
+    
+    // Add AI insights to the response
+    generatedCode = aiEnhanced.enhancedCode;
+    
+    console.log(`✅ ${language} code generated successfully with AI enhancements`);
+    console.log(`📊 AI Analysis: ${aiEnhanced.summary.totalFilesAnalyzed} files analyzed, Quality Score: ${aiEnhanced.summary.qualityScore}/10`);
     
     return generatedCode;
     
   } catch (error) {
-    throw new Error(`Failed to generate code: ${error.message}`);
+    console.error('❌ Code generation error:', error);
+    throw new Error(`Failed to generate ${language} code: ${error.message}`);
   }
 }
 
